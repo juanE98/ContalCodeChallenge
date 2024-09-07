@@ -1,12 +1,15 @@
 package net.contal.demo.services;
 
+import net.contal.demo.AccountNumberUtil;
 import net.contal.demo.DbUtils;
+import net.contal.demo.modal.BankTransaction;
 import net.contal.demo.modal.CustomerAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,18 +35,16 @@ public class BankService {
      * @param customerAccount populate this (firstName , lastName ) already provided
      * @return accountNumber
      */
-    public String createAnAccount(CustomerAccount customerAccount){
-            // TODO implement the rest
-
-
+    public String createAnAccount(CustomerAccount customerAccount) {
+        int accountNumber = AccountNumberUtil.generateAccountNumber();
+        customerAccount.setAccountNumber(accountNumber);
         dbUtils.openASession().saveOrUpdate(customerAccount);
-        //TODO return bank account number
-        return "";
+        return String.valueOf(accountNumber);
     }
 
 
     /**
-     * TODO implement this functions
+     *
      * @param accountNumber target account number
      * @param amount amount to register as transaction
      * @return boolean , if added as transaction
@@ -57,20 +58,38 @@ public class BankService {
          * return true if added , return false if account dont exist , or amount is null
          */
 
-        /** TODO write Query to get account by number un comment section below , catch query   */
-// HAlf code
-//                 String hql = "";
-//                 this.dbUtils.openASession().createQuery(hql,CustomerAccount.class)
-//                .setParameter("accountNumber",accountNumber)
-//                .getResultList();
+        if (amount == null) {
+            return false;
+        }
 
+        try {
+            String hql = "FROM CustomerAccount WHERE accountNumber = :accountNumber";
+            List<CustomerAccount> accounts = dbUtils.openASession()
+                    .createQuery(hql, CustomerAccount.class)
+                    .setParameter("accountNumber", accountNumber)
+                    .getResultList();
 
-        return false;
+            if (accounts.isEmpty()) {
+                return false;
+            }
+
+            CustomerAccount account = accounts.get(0);
+            BankTransaction transaction = new BankTransaction();
+            transaction.setCustomerAccount(account);
+            transaction.setTransactionAmount(amount);
+            transaction.setTransactionDate(new Date());
+
+            dbUtils.openASession().save(transaction);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
     /**
-     * TODO implement this functions
+     *
      * @param accountNumber target account
      * @return account balance
      */
@@ -83,15 +102,13 @@ public class BankService {
          *  return sum of amount
          *
          */
+        String hql = "SELECT SUM(transactionAmount) FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber";
+        Double balance = dbUtils.openASession()
+                .createQuery(hql,CustomerAccount.class)
+                .setParameter("accountNumber",accountNumber)
+                .getSingleResult().getAccountBalance();
 
-//                 String hql = "";
-//                 this.dbUtils.openASession().createQuery(hql,CustomerAccount.class)
-//                .setParameter("accountNumber",accountNumber)
-//                .getResultList();
-
-
-
-        return 0d;
+        return balance != null ? balance : 0d;
     }
 
 
