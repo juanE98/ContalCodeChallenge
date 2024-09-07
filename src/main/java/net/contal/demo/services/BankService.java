@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * TODO complete this service class
- * TODO use BankServiceTest class
+ * complete this service class
+ * use BankServiceTest class
  */
 @Service
 @Transactional
@@ -29,7 +30,7 @@ public class BankService {
 
 
     /**
-     * TODO implement the rest , populate require fields for CustomAccount (Generate Back account by using AccountNumberUtil )
+     * implement the rest , populate require fields for CustomAccount (Generate Back account by using AccountNumberUtil )
      * Save customAccount to database
      * return AccountNumber
      * @param customerAccount populate this (firstName , lastName ) already provided
@@ -52,7 +53,7 @@ public class BankService {
     public boolean addTransactions(int accountNumber , Double amount){
 
         /**
-         *TODO
+         *
          * Find and account by using accountNumber (Only write  the query in hql String  )
          * create Transaction for account with provided  amount
          * return true if added , return false if account dont exist , or amount is null
@@ -96,7 +97,7 @@ public class BankService {
     public double getBalance(int accountNumber){
 
         /**
-         *TODO
+         *
          *  find the account by this account Number
          *  sum total of transactions belong to account
          *  return sum of amount
@@ -118,16 +119,31 @@ public class BankService {
      * @param accountNumber accountNumber
      * @return HashMap [key: date , value: double]
      */
-    public Map<Date,Double> getDateBalance(int accountNumber){
+    public Map<Date,Double> getDateBalance(int accountNumber) {
         /**
-         *TODO
+         *
          * get all bank Transactions for this account number
          * Create map , Each Entry should hold a Date as a key and value as balance on key date from start of account
          * Example data [01/01/1992 , 2000$] balance 2000$ that date 01/01/1992
          */
+        try {
+            String hql = "FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber ORDER BY transactionDate";
+            List<BankTransaction> transactions = dbUtils.openASession()
+                    .createQuery(hql, BankTransaction.class)
+                    .setParameter("accountNumber", accountNumber)
+                    .getResultList();
 
-        return null;
+            Map<Date, Double> dateBalance = new HashMap<>();
+            double totalBalance = 0;
+
+            for (BankTransaction transaction : transactions) {
+                totalBalance += transaction.getTransactionAmount();
+                dateBalance.put(transaction.getTransactionDate(), totalBalance);
+            }
+            return dateBalance;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new HashMap<>();
+        }
     }
-
-
 }
