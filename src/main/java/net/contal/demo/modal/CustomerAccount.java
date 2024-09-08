@@ -9,7 +9,7 @@ public class CustomerAccount {
     @Id
     @GeneratedValue
     private long id;
-    @OneToMany(mappedBy = "customerAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany
     private List<BankTransaction> transactions;
 
     private String firstName;

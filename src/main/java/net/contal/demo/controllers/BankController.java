@@ -24,7 +24,7 @@ public class BankController {
      */
     @RequestMapping(method = RequestMethod.POST,value = "/create")
     public long createBankAccount(@RequestBody CustomerAccount account){
-        logger.info("Creating account for: {}" ,account.toString());
+        logger.info("Creating account for: {}" ,account.getId());
         return Long.parseLong(dataService.createAnAccount(account));
     }
 

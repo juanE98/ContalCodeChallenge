@@ -65,7 +65,7 @@ public class BankService {
 
         try {
             String hql = "FROM CustomerAccount WHERE accountNumber = :accountNumber";
-            List<CustomerAccount> accounts = dbUtils.openASession()
+            List<CustomerAccount> accounts = this.dbUtils.openASession()
                     .createQuery(hql, CustomerAccount.class)
                     .setParameter("accountNumber", accountNumber)
                     .getResultList();
@@ -73,8 +73,8 @@ public class BankService {
             if (accounts.isEmpty()) {
                 return false;
             }
-
             CustomerAccount account = accounts.get(0);
+
             BankTransaction transaction = new BankTransaction();
             transaction.setCustomerAccount(account);
             transaction.setTransactionAmount(amount);
@@ -104,12 +104,12 @@ public class BankService {
          *
          */
         String hql = "SELECT SUM(transactionAmount) FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber";
-        List<Double> result = dbUtils.openASession()
-                .createQuery(hql, Double.class)
+        List<CustomerAccount> result = this.dbUtils.openASession()
+                .createQuery(hql, CustomerAccount.class)
                 .setParameter("accountNumber", accountNumber)
                 .getResultList();
 
-        return (result.isEmpty() || result.get(0) == null) ? 0d : result.get(0);
+        return (result.isEmpty() || result.get(0) == null) ? 0d : result.get(0).getAccountBalance();
     }
 
     /**
@@ -120,12 +120,12 @@ public class BankService {
      */
     public CustomerAccount getAccountDetails(int accountNumber) {
         String hql = "FROM CustomerAccount WHERE accountNumber = :accountNumber";
-        List<CustomerAccount> accounts = dbUtils.openASession()
+        List<CustomerAccount> accounts = this.dbUtils.openASession()
                 .createQuery(hql, CustomerAccount.class)
                 .setParameter("accountNumber", accountNumber)
                 .getResultList();
 
-        return (accounts.isEmpty() || accounts.get(0) == null) ? new CustomerAccount() : accounts.get(0);
+        return accounts.isEmpty() ? null : accounts.get(0);
     }
 
 
@@ -144,7 +144,7 @@ public class BankService {
          */
         try {
             String hql = "FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber ORDER BY transactionDate";
-            List<BankTransaction> transactions = dbUtils.openASession()
+            List<BankTransaction> transactions = this.dbUtils.openASession()
                     .createQuery(hql, BankTransaction.class)
                     .setParameter("accountNumber", accountNumber)
                     .getResultList();
