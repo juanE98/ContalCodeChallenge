@@ -1,16 +1,18 @@
 package net.contal.demo;
 
+import java.util.Random;
+
 public abstract class AccountNumberUtil {
 
 
     /**
-     * TODO implement this function
+     * implement this function
      * this function should generate random integer number and return
      * @return random integer
      */
     public static int generateAccountNumber(){
-        //TODO help use Random  class part of java SDK
-        return -1;
+        Random random = new Random();
+        return 1000000000 + random.nextInt(900000000);
     }
 
 }

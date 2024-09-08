@@ -112,9 +112,25 @@ public class BankService {
         return balance != null ? balance : 0d;
     }
 
+    /**
+     * get account details of customer by account number
+     *
+     * @param accountNumber accountNumber
+     * @return CustomerAccount
+     */
+    public CustomerAccount getAccountDetails(int accountNumber) {
+        String hql = "FROM CustomerAccount WHERE accountNumber = :accountNumber";
+        List<CustomerAccount> accounts = dbUtils.openASession()
+                .createQuery(hql, CustomerAccount.class)
+                .setParameter("accountNumber", accountNumber)
+                .getResultList();
+
+        return accounts.isEmpty() ? null : accounts.get(0);
+    }
+
 
     /**
-     * TODO implement this functions
+     * implement this functions
      * ADVANCE TASK
      * @param accountNumber accountNumber
      * @return HashMap [key: date , value: double]

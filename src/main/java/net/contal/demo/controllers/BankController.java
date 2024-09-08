@@ -18,39 +18,48 @@ public class BankController {
 
 
     /**
-     *  TODO call properiate method in dataService to create an bank account , return generated bank account number
+     *  call properiate method in dataService to create an bank account , return generated bank account number
      * @param account {firstName:"" , lastName:"" }
      * @return bank account number
      */
     @RequestMapping(method = RequestMethod.POST,value = "/create")
     public long createBankAccount(@RequestBody CustomerAccount account){
-        logger.info("{}" ,account.toString());
-//TODO implement the rest
-        return -1;
+        logger.info("Creating account for: {}" ,account.toString());
+        return Long.parseLong(dataService.createAnAccount(account));
     }
 
     /**
-     *TODO call related Method from Service class to do the process
+     * call properiate method in dataService to return customer account details
+     * @param accountNumber BankAccount number
+     * @return CustomerAccount customer account details
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/account")
+    public CustomerAccount getAccountDetails(@RequestParam("accountNumber") String accountNumber){
+        logger.info("Fetching details for account number :{}",accountNumber);
+        return dataService.getAccountDetails(Integer.parseInt(accountNumber));
+    }
+
+
+    /**
+     * call related Method from Service class to do the process
      * @param accountNumber BankAccount number
      * @param amount Amount as Transaction
      */
     @RequestMapping(method = RequestMethod.POST,value = "/transaction")
     public void addTransaction(@RequestParam("accountNumber") String accountNumber, @RequestParam("amount") Double amount){
         logger.info("Bank Account number is :{} , Transaction Amount {}",accountNumber,amount);
-        //TODO implement the rest
+        dataService.addTransactions(Integer.parseInt(accountNumber), amount);
     }
 
 
     /**
-     * TODO call related Method from Service class to do the process
+     * call related Method from Service class to do the process
      * @param accountNumber customer  bank account  number
      * @return balance
      */
     @RequestMapping(method = RequestMethod.POST,value = "/balance")
     public Double getBalance(@RequestParam("accountNumber") String accountNumber){
         logger.info("Bank Account number is :{}",accountNumber);
-            //TODO implement the rest
-        return 0.0d;
+        return dataService.getBalance(Integer.parseInt(accountNumber));
     }
-
 }
