@@ -96,7 +96,7 @@ public class BankService {
      */
     public double getBalance(int accountNumber){
 
-        /**
+        /**acc
          *
          *  find the account by this account Number
          *  sum total of transactions belong to account
@@ -104,12 +104,12 @@ public class BankService {
          *
          */
         String hql = "SELECT SUM(transactionAmount) FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber";
-        Double balance = dbUtils.openASession()
-                .createQuery(hql,CustomerAccount.class)
-                .setParameter("accountNumber",accountNumber)
-                .getSingleResult().getAccountBalance();
+        List<Double> result = dbUtils.openASession()
+                .createQuery(hql, Double.class)
+                .setParameter("accountNumber", accountNumber)
+                .getResultList();
 
-        return balance != null ? balance : 0d;
+        return (result.isEmpty() || result.get(0) == null) ? 0d : result.get(0);
     }
 
     /**
@@ -125,7 +125,7 @@ public class BankService {
                 .setParameter("accountNumber", accountNumber)
                 .getResultList();
 
-        return accounts.isEmpty() ? null : accounts.get(0);
+        return (accounts.isEmpty() || accounts.get(0) == null) ? new CustomerAccount() : accounts.get(0);
     }
 
 
