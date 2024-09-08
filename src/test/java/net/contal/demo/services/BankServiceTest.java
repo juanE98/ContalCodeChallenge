@@ -1,9 +1,6 @@
-
 package net.contal.demo.services;
 
-import net.contal.demo.AccountNumberUtil;
 import net.contal.demo.DbUtils;
-import net.contal.demo.modal.BankTransaction;
 import net.contal.demo.modal.CustomerAccount;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

@@ -1,5 +1,7 @@
 package net.contal.demo.modal;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -9,7 +11,8 @@ public class CustomerAccount {
     @Id
     @GeneratedValue
     private long id;
-    @OneToMany
+    @OneToMany(mappedBy = "customerAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<BankTransaction> transactions;
 
     @Column(name = "firstName")

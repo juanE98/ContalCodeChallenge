@@ -1,9 +1,9 @@
 package net.contal.demo.modal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 import java.util.Date;
 
-// complete this class
 @Entity
 @Table
 public class BankTransaction {
@@ -11,14 +11,20 @@ public class BankTransaction {
     @Id
     @GeneratedValue
     private long id;
+
     @ManyToOne
+    @JoinColumn(name = "customer_account_id", nullable = false)
+    @JsonBackReference
     private CustomerAccount customerAccount;
 
-    @Column(name = "transactionAmount")
+    @Column(name = "transactionAmount", nullable = false)
     private double transactionAmount;
-    @Column(name = "transactionDate")
+
+    @Column(name = "transactionDate", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date transactionDate;
 
+    // Getters and Setters
 
     public long getId() {
         return id;
