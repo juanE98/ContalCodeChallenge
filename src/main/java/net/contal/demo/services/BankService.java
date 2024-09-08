@@ -4,6 +4,7 @@ import net.contal.demo.AccountNumberUtil;
 import net.contal.demo.DbUtils;
 import net.contal.demo.modal.BankTransaction;
 import net.contal.demo.modal.CustomerAccount;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class BankService {
     private final DbUtils dbUtils;
     @Autowired
     public BankService(DbUtils dbUtils) {
-        this.dbUtils = dbUtils;
+        this.dbUtils = dbUtils;;
     }
 
 
@@ -39,8 +40,20 @@ public class BankService {
     public String createAnAccount(CustomerAccount customerAccount) {
         int accountNumber = AccountNumberUtil.generateAccountNumber();
         customerAccount.setAccountNumber(accountNumber);
-        dbUtils.openASession().saveOrUpdate(customerAccount);
+        dbConnection(customerAccount);
+
         return String.valueOf(accountNumber);
+    }
+
+    /**
+     * Helper function to persist object to database
+     * @param obj the object to persist to database
+     */
+    private void dbConnection(Object obj) {
+        Session session = this.dbUtils.openASession();
+        session.persist(obj);
+        session.getTransaction().commit();
+        session.close();
     }
 
 
@@ -80,7 +93,7 @@ public class BankService {
             transaction.setTransactionAmount(amount);
             transaction.setTransactionDate(new Date());
 
-            dbUtils.openASession().save(transaction);
+            dbConnection(transaction);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,12 +117,12 @@ public class BankService {
          *
          */
         String hql = "SELECT SUM(transactionAmount) FROM BankTransaction WHERE customerAccount.accountNumber = :accountNumber";
-        List<CustomerAccount> result = this.dbUtils.openASession()
-                .createQuery(hql, CustomerAccount.class)
+        List<Double> result = this.dbUtils.openASession()
+                .createQuery(hql, Double.class)
                 .setParameter("accountNumber", accountNumber)
                 .getResultList();
 
-        return (result.isEmpty() || result.get(0) == null) ? 0d : result.get(0).getAccountBalance();
+        return (result.isEmpty() || result.get(0) == null) ? 0d : result.get(0);
     }
 
     /**

@@ -12,9 +12,13 @@ public class CustomerAccount {
     @OneToMany
     private List<BankTransaction> transactions;
 
+    @Column(name = "firstName")
     private String firstName;
+    @Column(name = "lastName")
     private String lastName;
+    @Column(name = "accountNumber")
     private int accountNumber;
+    @Column(name = "accountBalance")
     private double accountBalance;
 
     public long getId() {

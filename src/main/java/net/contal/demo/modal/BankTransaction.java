@@ -3,7 +3,7 @@ package net.contal.demo.modal;
 import javax.persistence.*;
 import java.util.Date;
 
-//TODO complete this class
+// complete this class
 @Entity
 @Table
 public class BankTransaction {
@@ -14,7 +14,9 @@ public class BankTransaction {
     @ManyToOne
     private CustomerAccount customerAccount;
 
+    @Column(name = "transactionAmount")
     private double transactionAmount;
+    @Column(name = "transactionDate")
     private Date transactionDate;
 
 
