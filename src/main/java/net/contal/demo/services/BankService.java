@@ -5,6 +5,7 @@ import net.contal.demo.DbUtils;
 import net.contal.demo.modal.BankTransaction;
 import net.contal.demo.modal.CustomerAccount;
 import org.hibernate.Session;
+import org.hibernate.SessionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class BankService {
     private final DbUtils dbUtils;
     @Autowired
     public BankService(DbUtils dbUtils) {
-        this.dbUtils = dbUtils;;
+        this.dbUtils = dbUtils;
     }
 
 
@@ -40,7 +41,7 @@ public class BankService {
     public String createAnAccount(CustomerAccount customerAccount) {
         int accountNumber = AccountNumberUtil.generateAccountNumber();
         customerAccount.setAccountNumber(accountNumber);
-        dbConnection(customerAccount);
+        addToDb(customerAccount);
 
         return String.valueOf(accountNumber);
     }
@@ -49,11 +50,15 @@ public class BankService {
      * Helper function to persist object to database
      * @param obj the object to persist to database
      */
-    private void dbConnection(Object obj) {
-        Session session = this.dbUtils.openASession();
-        session.persist(obj);
-        session.getTransaction().commit();
-        session.close();
+    private void addToDb(Object obj) {
+        try {
+            Session session = this.dbUtils.openASession();
+            session.persist(obj);
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            throw new SessionException("Error connecting to database");
+        }
     }
 
 
@@ -93,9 +98,10 @@ public class BankService {
             transaction.setTransactionAmount(amount);
             transaction.setTransactionDate(new Date());
 
-            dbConnection(transaction);
+            addToDb(transaction);
             return true;
         } catch (Exception e) {
+            //logging could be added
             e.printStackTrace();
             return false;
         }
@@ -138,7 +144,7 @@ public class BankService {
                 .setParameter("accountNumber", accountNumber)
                 .getResultList();
 
-        return accounts.isEmpty() ? null : accounts.get(0);
+        return (accounts.isEmpty() || accounts.get(0) == null) ? new CustomerAccount() : accounts.get(0);
     }
 
 
@@ -171,6 +177,7 @@ public class BankService {
             }
             return dateBalance;
         } catch (Exception e) {
+            //logging could be added
             e.printStackTrace();
             return new HashMap<>();
         }
